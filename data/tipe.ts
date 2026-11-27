@@ -19,3 +19,19 @@ export type Jurnal = {
   catatan: string | null;
   dibuat: string;
 };
+
+export type SiswaAdmin = Siswa & { kode: string};
+
+export type BarisRekap = {
+  id: number;
+  nama: string;
+  kelas: string;
+  jurnal: number;
+  jam: number;
+  menunggu: number
+};
+
+export type BarisJurnal = Jurnal & {
+  siswa: { nama: string; kelas: string } | null;
+}
+
