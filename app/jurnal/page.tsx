@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { ambilJurnalSiswa } from "@/data/ambil";
 import { pastikanMurid } from "@/lib/sesi";
 import { BADGE, NAMA_STATUS, tanggalIndo } from "@/lib/tampilan";
 
 export const metadata: Metadata = { title: "Jurnal Saya" };
+
+type Params = Promise<{ [kunci: string]: string | string[] | undefined }>;
 
 function Kartu({ judul, nilai }: { judul: string; nilai: number }) {
   return (
@@ -15,11 +18,8 @@ function Kartu({ judul, nilai }: { judul: string; nilai: number }) {
   );
 }
 
-export default async function Jurnal({
-  searchParams,
-}: {
-  searchParams: Promise<{ [kunci: string]: string | string[] | undefined }>;
-}) {
+// bagian yang membaca cookie, URL, dan database
+async function IsiJurnal({ searchParams }: { searchParams: Params }) {
   const siswaId = await pastikanMurid();
   const { info } = await searchParams;
   const daftar = await ambilJurnalSiswa(siswaId);
@@ -29,14 +29,7 @@ export default async function Jurnal({
   const revisi = daftar.filter((j) => j.status === "revisi").length;
 
   return (
-    <div>
-      <div className="mb-5 flex items-center">
-        <h1 className="flex-1 text-2xl font-bold">Jurnal Saya</h1>
-        <Link href="/jurnal/baru" className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700">
-          + Jurnal baru
-        </Link>
-      </div>
-
+    <>
       {typeof info === "string" && (
         <p className="mb-4 rounded bg-green-100 px-3 py-2 text-green-800">{info}</p>
       )}
@@ -101,6 +94,22 @@ export default async function Jurnal({
           </table>
         </div>
       )}
+    </>
+  );
+}
+
+export default function Jurnal({ searchParams }: { searchParams: Params }) {
+  return (
+    <div>
+      <div className="mb-5 flex items-center">
+        <h1 className="flex-1 text-2xl font-bold">Jurnal Saya</h1>
+        <Link href="/jurnal/baru" className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700">
+          + Jurnal baru
+        </Link>
+      </div>
+      <Suspense fallback={<p className="text-slate-500">Memuat jurnal...</p>}>
+        <IsiJurnal searchParams={searchParams} />
+      </Suspense>
     </div>
   );
 }

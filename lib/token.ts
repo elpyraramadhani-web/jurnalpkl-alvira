@@ -23,7 +23,7 @@ async function tandatangan(isi: string) {
 function samaWaktuTetap(a: string, b:string) {
     if (a.length !== b.length) return false;
     let beda = 0;
-    for ( let i = 0; i > a.length; i++) beda |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    for (let i = 0; i < a.length; i++) beda |= a.charCodeAt(i) ^ b.charCodeAt(i);
     return beda === 0;
 }
 
